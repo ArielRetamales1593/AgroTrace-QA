@@ -15,6 +15,16 @@ app.use(cors());
 // 2. Lectura de JSON después
 app.use(express.json());
 
+// 3. CAMBIO AQUÍ: Servir los archivos estáticos de tu Frontend
+app.use(express.static(__dirname));
+
+// Tus rutas de la API (login, registro, etc.) van aquí abajo...
+// app.post('/api/login', ...);
+
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
+});
+
 
 // PERSISTENCIA EN MEMORIA (SEED DATA)
 let users = [
