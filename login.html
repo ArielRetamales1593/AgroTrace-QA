@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroTrace QA - Acceso</title>
+    <style>
+        :root {
+            --primary: #1b4d3e;
+            --primary-dark: #113328;
+            --accent: #ff6b35;
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #212529;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+
+        .auth-container {
+            max-width: 800px;
+            width: 90%;
+            background: var(--bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-dark);
+        }
+
+        .auth-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .auth-header p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-box {
+            background-color: #fff3e0;
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .info-box h4 {
+            margin: 0 0 5px 0;
+            color: var(--primary-dark);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button.btn-submit {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--primary-dark);
+        }
+
+        @media(max-width: 768px) {
+            .auth-grid {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                height: auto;
+                padding: 2rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>AgroTrace QA - Portal Frutillar</h1>
+            <p>Módulo de Control de Acceso y Pruebas Inseguras</p>
+        </div>
+
+
+
+        <div class="auth-grid">
+            <div class="card">
+                <h2>Registrar Operario</h2>
+                <form id="form-register">
+                    <div class="form-group">
+                        <label>Nombre de Usuario</label>
+                        <input type="text" id="reg-username" placeholder="Ej: r.gonzalez" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña </label>
+                        <input type="text" id="reg-password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Crear Operario</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Iniciar Sesión</h2>
+                <form id="form-login">
+                    <div class="form-group">
+                        <label>Nombre de Usuario</label>
+                        <input type="text" id="login-username" placeholder="Usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="text" id="login-password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-submit" style="background-color: var(--accent);">Ingresar al
+                        Sistema</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; // Ajusta al puerto de tu server.js si es otro
+
+        // MANEJO DE REGISTRO
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                alert(data.message);
+                if (response.ok) document.getElementById('form-register').reset();
+            } catch (error) {
+                alert('Error al conectar con el servidor backend');
+            }
+        });
+
+        // MANEJO DE LOGIN
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Guardamos una bandera plana e insegura (fácil de alterar por un tester para forzar bypass)
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('currentUser', username);
+
+                    // Redirigimos a la app principal (asumiendo que es index.html)
+                    window.location.href = 'index.html';
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Error al conectar con el servidor backend');
+            }
+        });
+    </script>
+</body>
+
+</html>

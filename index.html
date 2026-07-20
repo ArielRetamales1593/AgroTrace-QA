@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroTrace Simulator QA - Frutillar</title>
+    <style>
+        :root {
+            --primary: #1b4d3e;
+            /* Verde bosque elegante, más profundo */
+            --primary-dark: #113328;
+            /* Verde muy oscuro para estados hover */
+            --accent: #ff6b35;
+            /* Coral vibrante que contrasta mejor que el naranja puro */
+            --danger: #e63946;
+            /* Rojo moderno, menos "alerta de tráfico" */
+            --bg: #f8f9fa;
+            /* Gris limpio y luminoso */
+            --surface: #ffffff;
+            --text: #212529;
+            /* Gris casi negro, más suave para la vista */
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* MENÚ LATERAL */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .sidebar-brand h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .sidebar-brand p {
+            margin: 5px 0 0 0;
+            font-size: 0.8rem;
+            color: #a5d6a7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li button {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #c8e6c9;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu li button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-menu li button.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--surface);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .role-selector {
+            background: #f1f3f5;
+            padding: 0.4rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .role-selector span {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 0 10px;
+            color: #555;
+        }
+
+        .role-btn {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .role-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* PANTALLAS (VIEWS) */
+        .view-container {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .view-panel {
+            display: none;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* CUADROS DE INDICACIONES */
+        .info-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .info-box.alert-box {
+            background-color: #fff3e0;
+            border-left-color: var(--accent);
+        }
+
+        .info-box h4 {
+            margin: 0 0 5px 0;
+            color: var(--primary-dark);
+        }
+
+        /* FORMULARIOS Y TABLAS */
+        h2 {
+            margin-top: 0;
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button.btn-submit {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button:disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.8rem;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge.alert {
+            background-color: #ffe3e3;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .badge.ok {
+            background-color: #e6f4ea;
+            color: var(--primary);
+        }
+
+        .history-item {
+            padding: 0.75rem;
+            border-left: 4px solid var(--accent);
+            background: #fff9db;
+            margin-bottom: 0.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <img src="./img/gemini-svg.svg" alt="">
+
+            <p>Frutillar • Región de los Lagos</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li><button class="menu-btn active" onclick="switchView('view-predios', this)">📍 1. Registro de
+                    Predios</button>
+            </li>
+            <li><button class="menu-btn" onclick="switchView('view-animales', this)">🐄 2. Alta de Animales</button>
+            </li>
+            <li><button class="menu-btn" onclick="switchView('view-movimientos', this)">🚚 3. Traslado /
+                    Movimientos</button></li>
+            <li><button class="menu-btn" onclick="switchView('view-salud', this)">💉 4. Control Sanitario</button></li>
+            <li><button class="menu-btn" onclick="switchView('view-trazabilidad', this)">🔍 5. Buscador
+                    Historial</button></li>
+            <li><button class="menu-btn" onclick="switchView('view-reportes', this)">📊 6. Reportes de Stock</button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <h1 id="page-title" style="margin:0; font-size: 1.4rem; color: var(--primary-dark)">📍 Registro de Predios
+            </h1>
+            <div class="role-selector">
+                <span>PERFIL DE ACCESO:</span>
+                <button class="role-btn active" onclick="setRole('administrador', this)">Administrador</button>
+                <button class="role-btn" onclick="setRole('veterinario', this)">Veterinario</button>
+                <button class="role-btn" onclick="setRole('operador', this)">Operador</button>
+            </div>
+        </header>
+
+        <div class="view-container">
+
+            <div id="view-predios" class="view-panel active">
+                <!-- <div class="info-box">
+                    <h4>💡 Indicaciones de Negocio (RF-GAN-01):</h4>
+                    <p>Cada terreno rural en Frutillar debe contar con su <strong>RUP (Rol Único Predial)</strong>
+                        oficial emitido por el SAG antes de recibir animales.</p>
+                </div> -->
+                <div class="card">
+                    <h2>Registrar Nuevo Predio</h2>
+                    <form id="form-farm">
+                        <div class="form-group"><label>Nombre del Fundo / Estancia</label><input type="text"
+                                id="farm-name" placeholder="Ej: Fundo El Radal" required></div>
+                        <div class="form-group"><label>RUP (Código SAG)</label><input type="text" id="farm-rup"
+                                placeholder="Ej: 10.2.01.0345" required></div>
+                        <div class="form-group">
+                            <label>Sector de Frutillar</label>
+                            <select id="farm-sector">
+                                <option value="Frutillar Bajo">Frutillar Bajo</option>
+                                <option value="Frutillar Alto">Frutillar Alto</option>
+                                <option value="Casma">Casma</option>
+                                <option value="Quebrada Honda">Quebrada Honda</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-add-farm">Guardar e Instalar Predio</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Predios Habilitados de la Zona</h2>
+                    <table id="table-farms">
+                        <thead>
+                            <tr>
+                                <th>ID Interno</th>
+                                <th>Nombre</th>
+                                <th>RUP Legal</th>
+                                <th>Sector</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-animales" class="view-panel">
+                <!-- <div class="info-box">
+                    <h4>💡 Indicaciones de Negocio (RF-GAN-02 / RF-GAN-03):</h4>
+                    <p><strong>Control de Duplicidad:</strong> El arete (DIIO) se calcula de manera correlativa y
+                        automática para evitar errores humanos.</p>
+                </div> -->
+                <div class="card">
+                    <h2>Alta Individual de Ganado</h2>
+                    <form id="form-animal">
+                        <div class="form-group">
+                            <label>Código Único Nacional (DIIO / Arete Automático)</label>
+                            <input type="text" id="ani-diio" placeholder="Generando código..." readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Especie</label>
+                            <select id="ani-type" onchange="updateRazas()">
+                                <option value="Bovino Leche">Bovino Leche</option>
+                                <option value="Bovino Carne">Bovino Carne</option>
+                                <option value="Ovino">Ovino</option>
+                                <option value="Porcino">Porcino</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Raza Certificada</label><select id="ani-raza"></select></div>
+                        <div class="form-group"><label>Predio de Asignación Inicial</label><select
+                                id="ani-farm"></select></div>
+                        <div class="form-group"><label>Peso de Entrada (Kg)</label><input type="number" id="ani-weight"
+                                placeholder="Ej: 420" required></div>
+                        <div class="form-group"><label>Fecha de Nacimiento</label><input type="date" id="ani-birth"
+                                required></div>
+                        <button type="submit" class="btn-submit" id="btn-add-animal">Registrar e Identificar
+                            Animal</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-movimientos" class="view-panel">
+                <!-- <div class="info-box alert-box">
+                    <h4>⚠️ ALERTA DE TESTING - Ubicación del Defecto Sembrado (RF-GAN-08):</h4>
+                    <p><strong>El Bug Oculto:</strong> Active la casilla de "App Móvil". Ejecute un traslado. Verá que
+                        el stock cambia, pero en el Buscador de Trazabilidad el historial desaparecerá.</p>
+                </div> -->
+                <div class="card" style="border-top-color: var(--accent);">
+                    <h2>Emisión de Guía de Despacho Interno</h2>
+                    <form id="form-movement">
+                        <div class="form-group"><label>Seleccionar Animal por Arete (DIIO)</label><select
+                                id="mov-diio"></select></div>
+                        <div class="form-group"><label>Predio de Destino</label><select id="mov-farm-dest"></select>
+                        </div>
+                        <!-- <div
+                            style="background:#fff4e6; padding:1rem; margin-bottom:1.5rem; border-radius:6px; border: 1px solid #ffe8cc;">
+                            <input type="checkbox" id="mov-is-mobile" style="width:auto; margin-right:10px;">
+                            <label style="display:inline; color:#c05621; font-weight: bold;" for="mov-is-mobile">Simular
+                                Registro desde Dispositivo Móvil PDA (Genera Error de Traza)</label>
+                        </div> -->
+                        <button type="submit" class="btn-submit" style="background-color: var(--accent);"
+                            id="btn-move">Confirmar y Despachar Camión</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-salud" class="view-panel">
+                <!-- <div class="info-box">
+                    <h4>💡 Indicaciones de Negocio (RF-GAN-06):</h4>
+                    <p>Cualquier vacuna anterior a <strong>2026</strong> se catalogará como <strong>"VENCIDO"</strong>.
+                    </p>
+                </div> -->
+                <div class="card">
+                    <h2>Bitácora Veterinaria</h2>
+                    <form id="form-health">
+                        <div class="form-group"><label>Animal Intervenido</label><select id="health-diio"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Evento Clínico</label>
+                            <select id="health-type">
+                                <option value="Vacuna">Vacunación Oficial SAG</option>
+                                <option value="Control">Control Sanitario Preventivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Nombre del Procedimiento / Medicamento</label><input type="text"
+                                id="health-name" placeholder="Ej: Vacuna Contra Fiebre Aftosa" required></div>
+                        <div class="form-group"><label>Fecha de Inyección / Diagnóstico</label><input type="date"
+                                id="health-date" required></div>
+                        <button type="submit" class="btn-submit" id="btn-add-health">Estampar Registro Médico</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-trazabilidad" class="view-panel">
+                <div class="card">
+                    <h2>Consulta de Ficha Individual de Trazabilidad</h2>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="search-diio" placeholder="Escriba el DIIO exacto a buscar (Ej: CL-001)">
+                        <button type="button" onclick="searchAnimal()"
+                            style="padding:0 2rem; background:var(--accent); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Auditar</button>
+                    </div>
+                    <div id="ficha-resultado"
+                        style="display: none; margin-top: 2rem; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border: 1px solid #e0e0e0;">
+                        <h3 style="margin-top:0;">Ficha Ganadera Oficial: <span id="view-diio"
+                                style="color:var(--primary-dark)"></span></h3>
+                        <p><strong>Clasificación:</strong> <span id="view-type-raza"></span> | <strong>Masa
+                                Corporal:</strong> <span id="view-weight"></span> Kg</p>
+                        <p><strong>Ubicación Física Actual:</strong> <span id="view-farm-actual"
+                                style="color:var(--accent); font-weight:bold;"></span></p>
+                        <div id="view-alerts" style="margin: 1rem 0;"></div>
+                        <h4>Línea de Tiempo Operacional (Logs Auditables)</h4>
+                        <div id="view-history-logs"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-reportes" class="view-panel">
+                <div class="card">
+                    <h2>Existencia Ganadera por Unidad Predial</h2>
+                    <button type="button" onclick="loadReports()" class="btn-submit"
+                        style="width:auto; margin-bottom:1.5rem; background-color: #5c6bc0;">Actualizar Matriz de
+                        Stock</button>
+                    <table id="table-reports">
+                        <thead>
+                            <tr>
+                                <th>Nombre Fundo</th>
+                                <th>RUP Asignado</th>
+                                <th>Sector Comunal</th>
+                                <th>Stock Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <div class="report-actions" style="margin-bottom: 1.5rem; display: flex; gap: 10px;">
+                            <button onclick="exportarStockExcel()"
+                                style="padding: 0.6rem 1.2rem; background-color: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                                🟢 Descargar Excel (.xlsx)
+                            </button>
+                            <button onclick="exportarStockPDF()"
+                                style="padding: 0.6rem 1.2rem; background-color: #c62828; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                                🔴 Descargar Reporte PDF
+                            </button>
+                        </div>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
