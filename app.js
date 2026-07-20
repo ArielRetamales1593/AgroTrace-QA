@@ -2,7 +2,10 @@
  * AgroTrace Simulator QA - Frontend Logic (Versión Completa, Unificada y Corregida)
  */
 
+//const API_URL = "http://localhost:3000/api";
+
 const API_URL = "http://localhost:3000/api";
+
 let currentRole = "administrador";
 
 const razasPorEspecie = {
