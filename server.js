@@ -8,10 +8,13 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
-//const PORT = 3000;
 
-app.use(express.json());
+// 1. Siempre CORS primero
 app.use(cors());
+
+// 2. Lectura de JSON después
+app.use(express.json());
+
 
 // PERSISTENCIA EN MEMORIA (SEED DATA)
 let users = [
