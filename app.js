@@ -4,7 +4,7 @@
 
 //const API_URL = "http://localhost:3000/api";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://agrotrace-qa.onrender.com";
 
 let currentRole = "administrador";
 
