@@ -21,9 +21,6 @@ app.use(express.static(__dirname));
 // Tus rutas de la API (login, registro, etc.) van aquí abajo...
 // app.post('/api/login', ...);
 
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
 
 
 // PERSISTENCIA EN MEMORIA (SEED DATA)
